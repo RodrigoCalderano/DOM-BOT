@@ -37,7 +37,8 @@ class Sniffer(mt.MetaTrader):
             # Dispatching data:
             self.dispatch(formatted_data)
             # Waiting to get next data
-            time.sleep(10)
+            # Sec * Min
+            time.sleep(60 * 30)
 
     def dispatch(self, data):
         # Filling queues
@@ -49,7 +50,8 @@ class Sniffer(mt.MetaTrader):
     def metatrader_connection(self, socket, stock_code):
         self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'RATES|' + stock_code)
-        #mt_response = self.meta_trader_get_values(socket, 'TRADE|BUY|' + stock_code)
+        # for _ in range(10):
+        #     mt_response = self.meta_trader_get_values(socket, 'TRADE|BUY|' + stock_code)
         print(mt_response)
         self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
         return mt_response

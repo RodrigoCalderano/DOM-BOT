@@ -16,5 +16,5 @@ class LongShortConsumer(extend.BaseConsumer):
 
             logger.info('Running', cname=type(self).__name__)
 
-            self._oqueue.put({'key': 'Telegram', 'value': {'key': 'PETR4', 'value': 20.56}})
+            #self._oqueue.put({'key': 'Telegram', 'value': {'key': 'PETR4', 'value': 20.56}})
             self._iqueue.task_done()

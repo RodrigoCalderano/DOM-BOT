@@ -1,4 +1,5 @@
 from Consumers import base_cosumer as extend
+from Sevices.telegram_alarm import Telegram
 
 
 class TaskExecutor(extend.BaseConsumer):
@@ -15,9 +16,8 @@ class TaskExecutor(extend.BaseConsumer):
             logger.info('Running', cname=type(self).__name__)
 
             if data_from_q['key'] == 'Telegram':
-                self.telegram_sender(data_from_q)
+                logger.info('Sending data to telegram: ' + str(data_from_q), cname=type(self).__name__)
+                Telegram.send_message(str(data_from_q))
             self._iqueue.task_done()
 
-    def telegram_sender(self, data):
-        logger = self.logger
-        logger.info('Sending data to telegram: ' + str(data), cname=type(self).__name__)
+
