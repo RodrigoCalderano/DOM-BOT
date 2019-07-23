@@ -1,10 +1,9 @@
 import daiquiri
 import logging
-from sniffer import Sniffer
+from Controllers.sniffer import Sniffer
 from Consumers.long_short_consumer import LongShortConsumer
 from Consumers.moving_avg_consumer import MovingAverageConsumer
-from Sevices.telegram_alarm import Telegram
-from task_executor import TaskExecutor
+from Controllers.task_executor import TaskExecutor
 import queue
 
 

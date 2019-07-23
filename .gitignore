@@ -17,8 +17,11 @@ key
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-
+.idea/vcs.xml
+.idea/workspace.xml
+	
 # Generated files
+
 .idea/**/contentModel.xml
 
 # Sensitive or high-churn files
