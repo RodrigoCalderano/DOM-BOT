@@ -1,7 +1,7 @@
 import requests
-from Helper import Consants
+from Helper import Constants
 
-API_KEY_TELEGRAM = Consants.API_KEY_TELEGRAM
+API_KEY_TELEGRAM = Constants.API_KEY_TELEGRAM
 BASE_URL_TELEGRAM = 'https://api.telegram.org/bot'
 SEND_MESSAGE = "/sendMessage?text="
 CHAT_ID = '&chat_id='
