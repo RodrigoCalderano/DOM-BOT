@@ -1,5 +1,6 @@
 import time
 from Sevices import meta_trader as mt
+import pandas as pd
 
 
 class Sniffer(mt.MetaTrader):
@@ -19,17 +20,24 @@ class Sniffer(mt.MetaTrader):
     def start(self, mode, socket=''):
         if mode == 'test':
             self.logger.info('Backtesting operation mode', cname=type(self).__name__)
-            self.historical()
+            self.back_testing()
         if mode == 'track':
             self.logger.info('Tracking operation mode', cname=type(self).__name__)
             self.tracking(socket)
         else:
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
-    def historical(self):
-        a = 1
-        print(a)
+    def back_testing(self):
+        df = pd.read_csv("/home/rodrigo/Desktop/PythonCodes/DOM-BOT/Jupyter/HISTORICO_2018/ABEV3_2018")
+        #for i in range(len(df)):
+        #    print(df.iloc[i])
+        data = df.iloc[100]
+        print(data)
+        print(data['PRECO MAXIMO'])
         # TODO
+        #  VOU SEMPRE MANDAR ESSE DATA FRAME -
+        #  QUANDO FOR TESTE CONSUMIDOR TEM QUE OLHAR RANGE ABERTURA E FECHAMENTO
+        #  QUANDO FOR TRACKING O FECHAMENTO RECEBE O VALOR ATUAL, MAS ANTES ATUALIZA A PARADA
 
     def tracking(self, mt_socket):
         while True:
@@ -64,8 +72,6 @@ class Sniffer(mt.MetaTrader):
     def metatrader_acquisition(self, socket, stock_code):
         self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'RATES|' + stock_code)
-        # for _ in range(10):
-        #     mt_response = self.meta_trader_get_values(socket, 'TRADE|BUY|' + stock_code)
         print(mt_response)
         self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
         return mt_response
