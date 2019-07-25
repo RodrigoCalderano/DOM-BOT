@@ -4,7 +4,11 @@ from Controllers.sniffer import Sniffer
 from Consumers.long_short_consumer import LongShortConsumer
 from Consumers.moving_avg_consumer import MovingAverageConsumer
 from Controllers.task_executor import TaskExecutor
+from Sevices import meta_trader as mt
 import queue
+
+mode = 'test'
+# mode = 'track'
 
 
 def main():
@@ -33,12 +37,15 @@ def main():
     long_short_consumer.run()
     moving_avg_consumer.run()
 
+    # Get metatrader socket TODO: TEST THIS!
+    socket = mt.MetaTrader.meta_trader_connector()
+
     # Run the Outer Handler
-    t_exec.run()
+    t_exec.start(socket=socket)
 
     # After all consumers and the outer handler is running, start filling the queues by running the sniffer
     try:
-        status = sniffer.start()
+        status = sniffer.start(mode=mode, socket=socket)
         logger.info("---Terminated---", status=status)
     except Exception as e:
         logger.error(e)

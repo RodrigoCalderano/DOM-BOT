@@ -4,7 +4,7 @@ from Sevices import meta_trader as mt
 
 class Sniffer(mt.MetaTrader):
     """
-        Sniffer gets data and fill all the consumers queues
+        Sniffer gets data and fills all the consumers queues
     """
     _queues = []
 
@@ -16,13 +16,24 @@ class Sniffer(mt.MetaTrader):
         self._queues.append(queue)
         return queue
 
-    def start(self):
-        mt_socket = self.meta_trader_connector()
+    def start(self, mode, socket=''):
+        if mode == 'test':
+            self.historical()
+        if mode == 'track':
+            self.tracking(socket)
+        else:
+            self.logger.info('Invalid operation mode', cname=type(self).__name__)
+
+    def historical(self):
+        a = 1
+        # TODO
+
+    def tracking(self, mt_socket):
         while True:
             # Todo: loop through other stocks!!!!!!!!!!!!!
             stock_code = 'PETR4'
             # Getting data:
-            data = (self.metatrader_connection(socket=mt_socket, stock_code=stock_code)).split(',')
+            data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
             bid = data[0]
             ask = data[1]
             max = data[2]
@@ -47,7 +58,7 @@ class Sniffer(mt.MetaTrader):
             if data is not None:
                 queue.put_nowait(data)
 
-    def metatrader_connection(self, socket, stock_code):
+    def metatrader_acquisition(self, socket, stock_code):
         self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'RATES|' + stock_code)
         # for _ in range(10):

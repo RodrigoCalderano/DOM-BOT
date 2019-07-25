@@ -1,7 +1,7 @@
 import requests
+from Helper import Consants
 
-# TELEGRAM TODO TROCAR O TOKEN!!!!
-API_KEY_TELEGRAM = "669087829:AAGKDCOfyOwmAKMLlOvhyK9ziEM_pIJzqDs"
+API_KEY_TELEGRAM = Consants.API_KEY_TELEGRAM
 BASE_URL_TELEGRAM = 'https://api.telegram.org/bot'
 SEND_MESSAGE = "/sendMessage?text="
 CHAT_ID = '&chat_id='
