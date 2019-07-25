@@ -18,14 +18,17 @@ class Sniffer(mt.MetaTrader):
 
     def start(self, mode, socket=''):
         if mode == 'test':
+            self.logger.info('Backtesting operation mode', cname=type(self).__name__)
             self.historical()
         if mode == 'track':
+            self.logger.info('Tracking operation mode', cname=type(self).__name__)
             self.tracking(socket)
         else:
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
     def historical(self):
         a = 1
+        print(a)
         # TODO
 
     def tracking(self, mt_socket):

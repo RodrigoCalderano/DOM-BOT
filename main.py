@@ -16,6 +16,10 @@ def main():
     daiquiri.setup(level=logging.INFO)
     logger = daiquiri.getLogger('CM')
 
+    # Get metatrader socket TODO: TEST THIS!
+    socket = ''
+    # socket = mt.MetaTrader.meta_trader_connector()
+
     # Entry queues
     long_short_queue = queue.Queue()
     moving_avg_queue = queue.Queue()
@@ -25,7 +29,8 @@ def main():
 
     # Create instances
     sniffer = Sniffer(logger=logger)  # Queue filler
-    t_exec = TaskExecutor(iqueue=output_queue, logger=logger)  # Outer Handler - Módulo de execução de tarefas (MET)
+    # Outer Handler - Módulo de execução de tarefas (MET)
+    t_exec = TaskExecutor(iqueue=output_queue, logger=logger, socket=socket)
     long_short_consumer = LongShortConsumer(iqueue=long_short_queue, oqueue=output_queue, logger=logger)
     moving_avg_consumer = MovingAverageConsumer(iqueue=moving_avg_queue, oqueue=output_queue, logger=logger)
 
@@ -37,11 +42,8 @@ def main():
     long_short_consumer.run()
     moving_avg_consumer.run()
 
-    # Get metatrader socket TODO: TEST THIS!
-    socket = mt.MetaTrader.meta_trader_connector()
-
     # Run the Outer Handler
-    t_exec.start(socket=socket)
+    t_exec.run()
 
     # After all consumers and the outer handler is running, start filling the queues by running the sniffer
     try:

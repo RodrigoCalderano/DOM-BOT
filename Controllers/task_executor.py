@@ -1,13 +1,21 @@
 from Consumers import base_cosumer as extend
 from Sevices.telegram_alarm import Telegram
 from Sevices import meta_trader as mt
+from threading import Thread
 
 
-class TaskExecutor(extend.BaseConsumer, mt.MetaTrader):
-    def __init__(self, logger, iqueue=None):
-        super().__init__(logger, iqueue=iqueue)
+class TaskExecutor(mt.MetaTrader):
+    def __init__(self, logger, iqueue, socket):
+        self._iqueue = iqueue
+        self.logger = logger
+        self.socket = socket
 
-    def start(self, socket):
+    def run(self, **kwargs):
+        thread = Thread(target=self.start, kwargs=kwargs)
+        return thread.start()
+
+    def start(self):
+        socket = self.socket
         logger = self.logger
         while True:
             logger.info('Standby', cname=type(self).__name__)
