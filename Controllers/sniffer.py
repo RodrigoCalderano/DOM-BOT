@@ -1,10 +1,10 @@
 import time
-from Sevices import meta_trader as mt
+from Services import meta_trader as mt
 import pandas as pd
 
 WINDOWS_PATH = "C:/Users/Rodrigo/Desktop/DOM-BOT/Jupyter/HISTORICO_2018/"
 LINUX_PATH = "/home/rodrigo/Desktop/PythonCodes/DOM-BOT/Jupyter/HISTORICO_2018/"
-HIST_PATH = WINDOWS_PATH
+HIST_PATH = LINUX_PATH
 
 
 class Sniffer(mt.MetaTrader):
@@ -32,8 +32,9 @@ class Sniffer(mt.MetaTrader):
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
     def back_testing(self):
+        # LOOP THROUGH OTHER STOCKS
         df = pd.read_csv(HIST_PATH + "ABEV3_2018")
-
+        print(df.head())
         for i in range(len(df)):
             formatted_data = df.iloc[i]
             self.dispatch(formatted_data)
@@ -44,6 +45,7 @@ class Sniffer(mt.MetaTrader):
         #  QUANDO FOR TRACKING O FECHAMENTO RECEBE O VALOR ATUAL, MAS ANTES ATUALIZA A PARADA
 
     def tracking(self, mt_socket):
+        # TODO: FAZER PRIMEIRO O BACK_TESTING
         while True:
             # Todo: loop through other stocks!!!!!!!!!!!!!
             stock_code = 'PETR4'

@@ -1,6 +1,6 @@
 from Consumers import base_cosumer as extend
-from Sevices.telegram_alarm import Telegram
-from Sevices import meta_trader as mt
+from Services.telegram_alarm import Telegram
+from Services import meta_trader as mt
 from threading import Thread
 
 
@@ -24,9 +24,11 @@ class TaskExecutor(mt.MetaTrader):
 
             logger.info('Running', cname=type(self).__name__)
 
+            data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOGIACAO DO PAPEL'] +\
+                " em :" + str(data_from_q['DATA DO PREGAO'])
+
             Telegram.send_message(str(data_from_q['msg']))
 
-            # TODO DENTRO DO METATRADER_TRADER PEGAR DADOS DA OPERACAO
             # self.metatrader_trade(socket=socket, data=data_from_q)
 
             self._iqueue.task_done()

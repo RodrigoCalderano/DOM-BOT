@@ -2,9 +2,9 @@ import daiquiri
 import logging
 from Controllers.sniffer import Sniffer
 from Consumers.long_short_consumer import LongShortConsumer
-from Consumers.moving_avg_consumer import MovingAverageConsumer
+from Consumers.bollinger_band_consumer import BollingerBandConsumer
 from Controllers.task_executor import TaskExecutor
-from Sevices import meta_trader as mt
+from Services import meta_trader as mt
 import queue
 
 TEST_MODE = 'test'
@@ -17,7 +17,7 @@ def main():
     daiquiri.setup(level=logging.INFO)
     logger = daiquiri.getLogger('CM')
 
-    # Get metatrader socket TODO: TEST THIS!
+    # Get metatrader socket
     socket = ''
     # socket = mt.MetaTrader.meta_trader_connector()
 
@@ -33,7 +33,7 @@ def main():
     # Outer Handler - Módulo de execução de tarefas (MET)
     t_exec = TaskExecutor(iqueue=output_queue, logger=logger, socket=socket)
     long_short_consumer = LongShortConsumer(iqueue=long_short_queue, oqueue=output_queue, logger=logger)
-    moving_avg_consumer = MovingAverageConsumer(iqueue=moving_avg_queue, oqueue=output_queue, logger=logger)
+    moving_avg_consumer = BollingerBandConsumer(iqueue=moving_avg_queue, oqueue=output_queue, logger=logger)
 
     # Register queues that sniffer will fill
     sniffer.register_queue(long_short_queue)
