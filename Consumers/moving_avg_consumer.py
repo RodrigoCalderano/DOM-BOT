@@ -7,14 +7,26 @@ class MovingAverageConsumer(extend.BaseConsumer):
     """
     def method(self):
         logger = self.logger
+        fill_oqueue = False
         while True:
             logger.info('Standby - Waiting for data on queue', cname=type(self).__name__)
-
             data = self._iqueue.get()
-            print(data['bid'])
             # TODO: do stuff with data
+
+            if data['PRECO FECHAMENTO'] > data['BANDA_1_40 SUPERIOR']:
+                data['msg'] = "DE ACORDO COM MOVING AVERAGE VALE A PENA COMPRAR: " + \
+                              data['CODIGO DE NEGOGIACAO DO PAPEL'] + " em :" + str(data['DATA DO PREGAO'])
+                fill_oqueue = True
+
+            elif data['PRECO FECHAMENTO'] < data['BANDA_1_40 INFERIOR']:
+                data['msg'] = "DE ACORDO COM MOVING AVERAGE VALE A PENA Vender: " + \
+                              data['CODIGO DE NEGOGIACAO DO PAPEL'] + " em :" + str(data['DATA DO PREGAO'])
+                fill_oqueue = True
 
             logger.info('Running', cname=type(self).__name__)
 
-            self._oqueue.put({'key': 'Telegram', 'value': {'key': data['code'], 'value': data['bid']}})
+            if fill_oqueue:
+                self._oqueue.put(data)
+                fill_oqueue = False
+
             self._iqueue.task_done()

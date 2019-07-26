@@ -2,6 +2,10 @@ import time
 from Sevices import meta_trader as mt
 import pandas as pd
 
+WINDOWS_PATH = "C:/Users/Rodrigo/Desktop/DOM-BOT/Jupyter/HISTORICO_2018/"
+LINUX_PATH = "/home/rodrigo/Desktop/PythonCodes/DOM-BOT/Jupyter/HISTORICO_2018/"
+HIST_PATH = WINDOWS_PATH
+
 
 class Sniffer(mt.MetaTrader):
     """
@@ -28,12 +32,12 @@ class Sniffer(mt.MetaTrader):
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
     def back_testing(self):
-        df = pd.read_csv("/home/rodrigo/Desktop/PythonCodes/DOM-BOT/Jupyter/HISTORICO_2018/ABEV3_2018")
-        #for i in range(len(df)):
-        #    print(df.iloc[i])
-        data = df.iloc[100]
-        print(data)
-        print(data['PRECO MAXIMO'])
+        df = pd.read_csv(HIST_PATH + "ABEV3_2018")
+
+        for i in range(len(df)):
+            formatted_data = df.iloc[i]
+            self.dispatch(formatted_data)
+
         # TODO
         #  VOU SEMPRE MANDAR ESSE DATA FRAME -
         #  QUANDO FOR TESTE CONSUMIDOR TEM QUE OLHAR RANGE ABERTURA E FECHAMENTO

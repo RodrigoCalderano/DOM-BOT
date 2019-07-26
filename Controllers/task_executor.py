@@ -24,18 +24,10 @@ class TaskExecutor(mt.MetaTrader):
 
             logger.info('Running', cname=type(self).__name__)
 
-            if data_from_q['key'] == 'Telegram':
-                logger.info('Sending data to telegram: ' + str(data_from_q), cname=type(self).__name__)
-                Telegram.send_message(str(data_from_q))
+            Telegram.send_message(str(data_from_q['msg']))
 
-            # TODO AJUSTAR ESSE FINAL AQUI
-
-            if data_from_q['buy'] == 'Telegram':
-                self.metatrader_trade(socket=socket, data=data_from_q)
-            if data_from_q['sell'] == 'Telegram':
-                self.metatrader_trade(socket=socket, data=data_from_q)
-            else:
-                logger.info('Invalid data on queue: ' + str(data_from_q), cname=type(self).__name__)
+            # TODO DENTRO DO METATRADER_TRADER PEGAR DADOS DA OPERACAO
+            # self.metatrader_trade(socket=socket, data=data_from_q)
 
             self._iqueue.task_done()
 

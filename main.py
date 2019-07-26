@@ -7,8 +7,9 @@ from Controllers.task_executor import TaskExecutor
 from Sevices import meta_trader as mt
 import queue
 
-mode = 'test'
-# mode = 'track'
+TEST_MODE = 'test'
+TRACK_MODE = 'track'
+mode = TEST_MODE
 
 
 def main():
