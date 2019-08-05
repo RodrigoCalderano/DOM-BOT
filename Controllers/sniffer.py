@@ -1,10 +1,9 @@
 import time
 from Services import meta_trader as mt
 import pandas as pd
+from Helper import Constants
 
-WINDOWS_PATH = "C:/Users/Rodrigo/Desktop/DOM-BOT/Jupyter/HISTORICO_2018/"
-LINUX_PATH = "/home/rodrigo/Desktop/PythonCodes/DOM-BOT/Jupyter/HISTORICO_2018/"
-HIST_PATH = LINUX_PATH
+HIST_PATH = Constants.WINDOWS_HIST_PATH
 
 
 class Sniffer(mt.MetaTrader):
@@ -32,9 +31,9 @@ class Sniffer(mt.MetaTrader):
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
     def back_testing(self):
-        # LOOP THROUGH OTHER STOCKS
-        df = pd.read_csv(HIST_PATH + "ABEV3_2018")
-        print(df.head())
+        # TODO LOOP THROUGH OTHER STOCKS
+        # Getting from 39 days after day one of 2018
+        df = pd.read_csv(HIST_PATH + "ABEV3_2018").iloc[39:]
         for i in range(len(df)):
             formatted_data = df.iloc[i]
             self.dispatch(formatted_data)

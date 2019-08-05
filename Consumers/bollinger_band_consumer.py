@@ -1,4 +1,6 @@
 from Consumers import base_cosumer as extend
+from Helper import Constants
+import pandas as pd
 
 
 class BollingerBandConsumer(extend.BaseConsumer):
@@ -11,20 +13,43 @@ class BollingerBandConsumer(extend.BaseConsumer):
             data = self._iqueue.get()
             logger.info('Running', cname=type(self).__name__)
 
-            if data['BANDA_1_40 SUPERIOR'] == "EMPTY":
-                self._iqueue.task_done()
-                continue
+            stock_code = data['CODIGO DE NEGOGIACAO DO PAPEL']
 
-            if float(data['PRECO FECHAMENTO']) > float(data['BANDA_1_40 SUPERIOR']):
-                data['action'] = 'BUY'
-                fill_oqueue = True
+            df = pd.read_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
+            df = df.set_index('CODIGO DE NEGOGIACAO DO PAPEL')
+            current_state = df.loc[stock_code, 'ESTADO']
 
-            elif float(data['PRECO FECHAMENTO']) < float(data['BANDA_1_40 SUPERIOR']):
-                data['action'] = 'SELL'
-                fill_oqueue = True
+            # BACK TEST
+            back_test = pd.read_csv(Constants.WINDOWS_BACK_TEST_PATH + "BollingerBand")
+            back_test_id = len(back_test)
+            print(back_test_id) # TODO COLOCAR O TRADE NO DF
+
+            if current_state == 'PROCURANDO ENTRADA':
+                if float(data['PRECO FECHAMENTO']) > float(data['BANDA_1_40 SUPERIOR']):
+                    data['action'] = 'BUY'
+                    df.loc[stock_code, 'ESTADO'] = 'COMPRADO'
+                    fill_oqueue = True
+
+                elif float(data['PRECO FECHAMENTO']) < float(data['BANDA_1_40 SUPERIOR']):
+                    data['action'] = 'SELL'
+                    df.loc[stock_code, 'ESTADO'] = 'VENDIDO'
+                    fill_oqueue = True
+
+            elif current_state == 'COMPRADO':
+                if float(data['PRECO FECHAMENTO']) > float(data['MA_40']):
+                    data['action'] = 'SELL'
+                    df.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    fill_oqueue = True
+
+            elif current_state == 'VENDIDO':
+                if float(data['PRECO FECHAMENTO']) < float(data['MA_40']):
+                    data['action'] = 'BUY'
+                    df.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    fill_oqueue = True
 
             if fill_oqueue:
                 self._oqueue.put(data)
                 fill_oqueue = False
 
+            df.to_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
             self._iqueue.task_done()

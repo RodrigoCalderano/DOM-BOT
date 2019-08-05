@@ -26,7 +26,6 @@ class TaskExecutor(mt.MetaTrader):
 
             data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOGIACAO DO PAPEL'] +\
                 " em :" + str(data_from_q['DATA DO PREGAO'])
-
             Telegram.send_message(str(data_from_q['msg']))
 
             # self.metatrader_trade(socket=socket, data=data_from_q)
