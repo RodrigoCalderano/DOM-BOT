@@ -33,7 +33,7 @@ class Sniffer(mt.MetaTrader):
     def back_testing(self):
         # TODO LOOP THROUGH OTHER STOCKS
         # Getting from 39 days after day one of 2018
-        df = pd.read_csv(HIST_PATH + "ABEV3_2018").iloc[39:]
+        df = pd.read_csv(HIST_PATH + "PETR4_2018").iloc[39:]
         for i in range(len(df)):
             formatted_data = df.iloc[i]
             self.dispatch(formatted_data)
@@ -41,7 +41,7 @@ class Sniffer(mt.MetaTrader):
         # TODO
         #  VOU SEMPRE MANDAR ESSE DATA FRAME -
         #  QUANDO FOR TESTE CONSUMIDOR TEM QUE OLHAR RANGE ABERTURA E FECHAMENTO
-        #  QUANDO FOR TRACKING O FECHAMENTO RECEBE O VALOR ATUAL, MAS ANTES ATUALIZA A PARADA
+        #  QUANDO FOR TRACKING O FECHAMENTO RECEBE O VALOR ATUAL, MAS ANTES ATUALIZA DF
 
     def tracking(self, mt_socket):
         # TODO: FAZER PRIMEIRO O BACK_TESTING

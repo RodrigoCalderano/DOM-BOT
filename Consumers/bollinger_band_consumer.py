@@ -15,41 +15,51 @@ class BollingerBandConsumer(extend.BaseConsumer):
 
             stock_code = data['CODIGO DE NEGOGIACAO DO PAPEL']
 
-            df = pd.read_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
-            df = df.set_index('CODIGO DE NEGOGIACAO DO PAPEL')
-            current_state = df.loc[stock_code, 'ESTADO']
+            # Strategy data frame
+            strategy = pd.read_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
+            strategy = strategy.set_index('CODIGO DE NEGOGIACAO DO PAPEL')
+            current_state = strategy.loc[stock_code, 'ESTADO']
 
-            # BACK TEST
+            # back test data frame
             back_test = pd.read_csv(Constants.WINDOWS_BACK_TEST_PATH + "BollingerBand")
             back_test_id = len(back_test)
-            print(back_test_id) # TODO COLOCAR O TRADE NO DF
 
+            # Looking for entry points
             if current_state == 'PROCURANDO ENTRADA':
                 if float(data['PRECO FECHAMENTO']) > float(data['BANDA_1_40 SUPERIOR']):
-                    data['action'] = 'BUY'
-                    df.loc[stock_code, 'ESTADO'] = 'COMPRADO'
-                    fill_oqueue = True
-
-                elif float(data['PRECO FECHAMENTO']) < float(data['BANDA_1_40 SUPERIOR']):
                     data['action'] = 'SELL'
-                    df.loc[stock_code, 'ESTADO'] = 'VENDIDO'
+                    strategy.loc[stock_code, 'ESTADO'] = 'VENDIDO'
                     fill_oqueue = True
 
+                elif float(data['PRECO FECHAMENTO']) < float(data['BANDA_1_40 INFERIOR']):
+                    data['action'] = 'BUY'
+                    strategy.loc[stock_code, 'ESTADO'] = 'COMPRADO'
+                    fill_oqueue = True
+
+            # Looking for close long position
             elif current_state == 'COMPRADO':
                 if float(data['PRECO FECHAMENTO']) > float(data['MA_40']):
                     data['action'] = 'SELL'
-                    df.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    strategy.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
                     fill_oqueue = True
 
+            # Looking for close short position
             elif current_state == 'VENDIDO':
                 if float(data['PRECO FECHAMENTO']) < float(data['MA_40']):
                     data['action'] = 'BUY'
-                    df.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    strategy.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
                     fill_oqueue = True
 
+            # Fill outer queue
             if fill_oqueue:
+                back_test.loc[back_test_id + 1, 'CODIGO DE NEGOGIACAO DO PAPEL'] = data['CODIGO DE NEGOGIACAO DO PAPEL']
+                back_test.loc[back_test_id + 1, 'DATA DO PREGAO'] = int(data['DATA DO PREGAO'])
+                back_test.loc[back_test_id + 1, 'PRECO'] = data['PRECO FECHAMENTO']
+                back_test.loc[back_test_id + 1, 'OPERACAO'] = data['action']
                 self._oqueue.put(data)
                 fill_oqueue = False
 
-            df.to_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
+            # Update data frames and inner queue
+            back_test.to_csv(Constants.WINDOWS_BACK_TEST_PATH + "BollingerBand", index=False)
+            strategy.to_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
             self._iqueue.task_done()
