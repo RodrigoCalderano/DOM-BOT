@@ -26,40 +26,77 @@ class BollingerBandConsumer(extend.BaseConsumer):
 
             # Looking for entry points
             if current_state == 'PROCURANDO ENTRADA':
-                if float(data['PRECO FECHAMENTO']) > float(data['BANDA_1_40 SUPERIOR']):
+                # Trying to buy if above bollinger bands
+                if float(data['PRECO MAXIMO']) > float(data['BANDA_1_40 SUPERIOR']):
                     data['action'] = 'SELL'
                     strategy.loc[stock_code, 'ESTADO'] = 'VENDIDO'
+                    # Check candle gaps
+                    if ((float(data['PRECO MINIMO']) < float(data['BANDA_1_40 SUPERIOR'])) and (
+                            float(data['PRECO MAXIMO']) > float(data['BANDA_1_40 SUPERIOR']))):
+                        price = data['BANDA_1_40 SUPERIOR']
+                    else:
+                        price = data['PRECO DE ABERTURA']
+                    self.back_test_updater(back_test=back_test, back_test_id=back_test_id, stock_code=stock_code,
+                                           date=data['DATA DO PREGAO'], price=price, action='SELL')
                     fill_oqueue = True
 
-                elif float(data['PRECO FECHAMENTO']) < float(data['BANDA_1_40 INFERIOR']):
+                # Trying to sell if above bollinger bands
+                elif float(data['PRECO MINIMO']) < float(data['BANDA_1_40 INFERIOR']):
                     data['action'] = 'BUY'
                     strategy.loc[stock_code, 'ESTADO'] = 'COMPRADO'
+                    # Check candle gaps
+                    if ((float(data['PRECO MINIMO']) < float(data['BANDA_1_40 INFERIOR'])) and (
+                            float(data['PRECO MAXIMO']) > float(data['BANDA_1_40 INFERIOR']))):
+                        price = data['BANDA_1_40 INFERIOR']
+                    else:
+                        price = data['PRECO DE ABERTURA']
+                    self.back_test_updater(back_test=back_test, back_test_id=back_test_id, stock_code=stock_code,
+                                           date=data['DATA DO PREGAO'], price=price, action='BUY')
                     fill_oqueue = True
 
             # Looking for close long position
             elif current_state == 'COMPRADO':
-                if float(data['PRECO FECHAMENTO']) > float(data['MA_40']):
+                if float(data['PRECO MAXIMO']) > float(data['MA_40']):
                     data['action'] = 'SELL'
                     strategy.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    # Check candle gaps
+                    if ((float(data['PRECO MINIMO']) < float(data['MA_40'])) and (
+                            float(data['PRECO MAXIMO']) > float(data['MA_40']))):
+                        price = data['MA_40']
+                    else:
+                        price = data['PRECO DE ABERTURA']
+                    self.back_test_updater(back_test=back_test, back_test_id=back_test_id, stock_code=stock_code,
+                                           date=data['DATA DO PREGAO'], price=price, action='SELL')
                     fill_oqueue = True
 
             # Looking for close short position
             elif current_state == 'VENDIDO':
-                if float(data['PRECO FECHAMENTO']) < float(data['MA_40']):
+                if float(data['PRECO MINIMO']) < float(data['MA_40']):
                     data['action'] = 'BUY'
                     strategy.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
+                    # Check candle gaps
+                    if ((float(data['PRECO MINIMO']) < float(data['MA_40'])) and (
+                            float(data['PRECO MAXIMO']) > float(data['MA_40']))):
+                        price = data['MA_40']
+                    else:
+                        price = data['PRECO DE ABERTURA']
+                    self.back_test_updater(back_test=back_test, back_test_id=back_test_id, stock_code=stock_code,
+                                           date=data['DATA DO PREGAO'], price=price, action='BUY')
                     fill_oqueue = True
 
             # Fill outer queue
             if fill_oqueue:
-                back_test.loc[back_test_id + 1, 'CODIGO DE NEGOGIACAO DO PAPEL'] = data['CODIGO DE NEGOGIACAO DO PAPEL']
-                back_test.loc[back_test_id + 1, 'DATA DO PREGAO'] = int(data['DATA DO PREGAO'])
-                back_test.loc[back_test_id + 1, 'PRECO'] = data['PRECO FECHAMENTO']
-                back_test.loc[back_test_id + 1, 'OPERACAO'] = data['action']
                 self._oqueue.put(data)
                 fill_oqueue = False
 
-            # Update data frames and inner queue
-            back_test.to_csv(Constants.WINDOWS_BACK_TEST_PATH + "BollingerBand", index=False)
+            # Update data frame and inner queue
             strategy.to_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
             self._iqueue.task_done()
+
+    def back_test_updater(self, back_test, back_test_id, stock_code, date, price, action):
+        back_test.loc[back_test_id + 1, 'CODIGO DE NEGOGIACAO DO PAPEL'] = stock_code
+        back_test.loc[back_test_id + 1, 'DATA DO PREGAO'] = date
+        back_test.loc[back_test_id + 1, 'PRECO'] = price
+        back_test.loc[back_test_id + 1, 'OPERACAO'] = action
+        back_test.to_csv(Constants.WINDOWS_BACK_TEST_PATH + "BollingerBand", index=False)
+
