@@ -33,7 +33,7 @@ class Sniffer(mt.MetaTrader):
     def back_testing(self):
         # TODO LOOP THROUGH OTHER STOCKS
         # Getting from 39 days after day one of 2018
-        df = pd.read_csv(HIST_PATH + "PETR4_2018").iloc[39:]
+        df = pd.read_csv(HIST_PATH + "CMIG4_2018").iloc[39:]
         for i in range(len(df)):
             formatted_data = df.iloc[i]
             self.dispatch(formatted_data)
