@@ -4,6 +4,7 @@ import pandas as pd
 from Helper import Constants
 
 HIST_PATH = Constants.WINDOWS_HIST_PATH
+BLUE_CHIPS = Constants.WINDOWS_BLUE_CHIPS_PATH
 
 
 class Sniffer(mt.MetaTrader):
@@ -31,17 +32,16 @@ class Sniffer(mt.MetaTrader):
             self.logger.info('Invalid operation mode', cname=type(self).__name__)
 
     def back_testing(self):
-        # TODO LOOP THROUGH OTHER STOCKS
-        # Getting from 39 days after day one of 2018
-        df = pd.read_csv(HIST_PATH + "CMIG4_2018").iloc[39:]
-        for i in range(len(df)):
-            formatted_data = df.iloc[i]
-            self.dispatch(formatted_data)
-
-        # TODO
-        #  VOU SEMPRE MANDAR ESSE DATA FRAME -
-        #  QUANDO FOR TESTE CONSUMIDOR TEM QUE OLHAR RANGE ABERTURA E FECHAMENTO
-        #  QUANDO FOR TRACKING O FECHAMENTO RECEBE O VALOR ATUAL, MAS ANTES ATUALIZA DF
+        blue_chips = pd.read_csv(BLUE_CHIPS)
+        # For each day
+        for each_day in range(246-39):
+            # Getting from 39 days after day one of 2018 to fill ma
+            day = each_day + 39
+            # For each blue_chip
+            print('rodei todas empresas antes de :' + str(day))
+            for blue_chip in blue_chips['CODIGO DE NEGOGIACAO DO PAPEL']:
+                formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
+                self.dispatch(formatted_data)
 
     def tracking(self, mt_socket):
         # TODO: FAZER PRIMEIRO O BACK_TESTING
@@ -70,7 +70,7 @@ class Sniffer(mt.MetaTrader):
     def dispatch(self, data):
         # Filling queues
         for queue in self._queues:
-            self.logger.info('Filling queue')
+            self.logger.info('Filling queue', cname=type(self).__name__)
             if data is not None:
                 queue.put_nowait(data)
 
