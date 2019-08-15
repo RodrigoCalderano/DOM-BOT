@@ -18,13 +18,11 @@ class TaskExecutor(mt.MetaTrader):
         socket = self.socket
         logger = self.logger
         while True:
-            logger.info('Standby', cname=type(self).__name__)
-
+            # TODO UNC logger.info('Standby', cname=type(self).__name__)
             data_from_q = self._iqueue.get()
+            # TODO UNC logger.info('Running', cname=type(self).__name__)
 
-            logger.info('Running', cname=type(self).__name__)
-
-            data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOGIACAO DO PAPEL'] +\
+            data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOCIACAO DO PAPEL'] +\
                 " em :" + str(data_from_q['DATA DO PREGAO'])
 
             # TODO TELEGRAM DISABLED FOR BACK TESTING

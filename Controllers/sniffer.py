@@ -34,14 +34,18 @@ class Sniffer(mt.MetaTrader):
     def back_testing(self):
         blue_chips = pd.read_csv(BLUE_CHIPS)
         # For each day
-        for each_day in range(246-39):
+        for each_day in range(245-39):
             # Getting from 39 days after day one of 2018 to fill ma
             day = each_day + 39
+            self.logger.info('Day: ' + str(day), cname=type(self).__name__)
             # For each blue_chip
-            print('rodei todas empresas antes de :' + str(day))
-            for blue_chip in blue_chips['CODIGO DE NEGOGIACAO DO PAPEL']:
-                formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
-                self.dispatch(formatted_data)
+            for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
+                try:
+                    formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
+                    self.dispatch(formatted_data)
+                except:
+                    print('nao consegui')
+
 
     def tracking(self, mt_socket):
         # TODO: FAZER PRIMEIRO O BACK_TESTING
@@ -70,7 +74,7 @@ class Sniffer(mt.MetaTrader):
     def dispatch(self, data):
         # Filling queues
         for queue in self._queues:
-            self.logger.info('Filling queue', cname=type(self).__name__)
+            # TODO UNC self.logger.info('Filling queue', cname=type(self).__name__)
             if data is not None:
                 queue.put_nowait(data)
 

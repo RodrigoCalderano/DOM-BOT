@@ -9,15 +9,15 @@ class BollingerBandConsumer(extend.BaseConsumer):
         logger = self.logger
         fill_oqueue = False
         while True:
-            logger.info('Standby - Waiting for data on queue', cname=type(self).__name__)
+            # TODO UNC logger.info('Standby - Waiting for data on queue', cname=type(self).__name__)
             data = self._iqueue.get()
-            logger.info('Running', cname=type(self).__name__)
+            # TODO UNC logger.info('Running', cname=type(self).__name__)
 
-            stock_code = data['CODIGO DE NEGOGIACAO DO PAPEL']
+            stock_code = data['CODIGO DE NEGOCIACAO DO PAPEL']
 
             # Strategy data frame
             strategy = pd.read_csv(Constants.WINDOWS_STRATEGIES_PATH + "BollingerBand")
-            strategy = strategy.set_index('CODIGO DE NEGOGIACAO DO PAPEL')
+            strategy = strategy.set_index('CODIGO DE NEGOCIACAO DO PAPEL')
             current_state = strategy.loc[stock_code, 'ESTADO']
 
             # back test data frame
@@ -94,7 +94,7 @@ class BollingerBandConsumer(extend.BaseConsumer):
             self._iqueue.task_done()
 
     def back_test_updater(self, back_test, back_test_id, stock_code, date, price, action):
-        back_test.loc[back_test_id + 1, 'CODIGO DE NEGOGIACAO DO PAPEL'] = stock_code
+        back_test.loc[back_test_id + 1, 'CODIGO DE NEGOCIACAO DO PAPEL'] = stock_code
         back_test.loc[back_test_id + 1, 'DATA DO PREGAO'] = date
         back_test.loc[back_test_id + 1, 'PRECO'] = price
         back_test.loc[back_test_id + 1, 'OPERACAO'] = action
