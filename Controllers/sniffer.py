@@ -43,9 +43,8 @@ class Sniffer(mt.MetaTrader):
                 try:
                     formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
                     self.dispatch(formatted_data)
-                except:
-                    print('nao consegui')
-
+                except Exception as e:
+                    self.logger.error(e)
 
     def tracking(self, mt_socket):
         # TODO: FAZER PRIMEIRO O BACK_TESTING
