@@ -46,9 +46,9 @@ def main():
 
     # TODO UNC: RUN ALL
     # Run the consumers
-    # long_short_consumer.run()
+    long_short_consumer.run()
     # bollinger_band_consumer.run()
-    bollinger_band_consumer_v2.run()
+    # bollinger_band_consumer_v2.run()
 
     # Run the Outer Handler
     t_exec.run()

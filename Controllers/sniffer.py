@@ -6,6 +6,9 @@ from Helper import Constants
 HIST_PATH = Constants.WINDOWS_HIST_PATH
 BLUE_CHIPS = Constants.WINDOWS_BLUE_CHIPS_PATH
 
+PAIR_PATH = Constants.WINDOWS_PAIR_INFO_PATH
+PAIRS = Constants.WINDOWS_PAIRS_PATH
+
 
 class Sniffer(mt.MetaTrader):
     """
@@ -33,18 +36,29 @@ class Sniffer(mt.MetaTrader):
 
     def back_testing(self):
         blue_chips = pd.read_csv(BLUE_CHIPS)
+        pairs_df = pd.read_csv(PAIRS)
         # For each day
         for each_day in range(245-39):
             # Getting from 39 days after day one of 2018 to fill ma
             day = each_day + 39
             self.logger.info('Day: ' + str(day), cname=type(self).__name__)
-            # For each blue_chip
-            for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
+
+            # Long and Short
+            for pair in pairs_df['Par']:
                 try:
-                    formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
+                    formatted_data = pd.read_csv(PAIR_PATH + pair).iloc[day]
                     self.dispatch(formatted_data)
                 except Exception as e:
                     self.logger.error(e)
+
+            # # TODO UNC
+            # # For each blue_chip
+            # for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
+            #     try:
+            #         formatted_data = pd.read_csv(HIST_PATH + blue_chip + "_2018").iloc[day]
+            #         self.dispatch(formatted_data)
+            #     except Exception as e:
+            #         self.logger.error(e)
 
     def tracking(self, mt_socket):
         # TODO: FAZER PRIMEIRO O BACK_TESTING
