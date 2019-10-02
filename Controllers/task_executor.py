@@ -22,8 +22,8 @@ class TaskExecutor(mt.MetaTrader):
             data_from_q = self._iqueue.get()
             # TODO UNC logger.info('Running', cname=type(self).__name__)
 
-            data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOCIACAO DO PAPEL'] +\
-                " em :" + str(data_from_q['DATA DO PREGAO'])
+            # data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOCIACAO DO PAPEL'] +\
+            #     " em :" + str(data_from_q['DATA DO PREGAO'])
 
             # TODO TELEGRAM DISABLED FOR BACK TESTING
             #  Telegram.send_message(str(data_from_q['msg']))
