@@ -10,7 +10,7 @@ import queue
 
 TEST_MODE = 'test'
 TRACK_MODE = 'track'
-mode = TEST_MODE
+mode = TRACK_MODE
 
 
 def main():
@@ -20,8 +20,8 @@ def main():
 
     # Get metatrader socket
     # TODO: CHANGE THIS WHEN USING META TRADER
-    socket = ''
-    # socket = mt.MetaTrader.meta_trader_connector()
+    # socket = ''
+    socket = mt.MetaTrader.meta_trader_connector()
 
     # Entry queues
     long_short_queue = queue.Queue()

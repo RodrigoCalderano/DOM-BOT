@@ -79,6 +79,7 @@ class Sniffer(mt.MetaTrader):
                 'min': min
             }
             # Dispatching data:
+            print(formatted_data)
             self.dispatch(formatted_data)
             # Waiting to get next data
             # Sec * Min
