@@ -1,6 +1,10 @@
 import time
-from Services import meta_trader as mt
 import pandas as pd
+import datetime
+from datetime import datetime
+import pytz
+
+from Services import meta_trader as mt
 from Helper import Constants
 
 HIST_PATH = Constants.WINDOWS_HIST_PATH
@@ -51,7 +55,7 @@ class Sniffer(mt.MetaTrader):
                 except Exception as e:
                     self.logger.error(e)
 
-            # # TODO UNC
+            # # UNC this when not using ls
             # # For each blue_chip
             # for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
             #     try:
@@ -61,29 +65,68 @@ class Sniffer(mt.MetaTrader):
             #         self.logger.error(e)
 
     def tracking(self, mt_socket):
-        # TODO: FAZER PRIMEIRO O BACK_TESTING
+        blue_chips = pd.read_csv(BLUE_CHIPS)
+        pairs_df = pd.read_csv(PAIRS)
+
         while True:
-            # Todo: loop through other stocks!!!!!!!!!!!!!
-            stock_code = 'PETR4'
-            # Getting data:
-            data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
-            bid = data[0]
-            ask = data[1]
-            max = data[2]
-            min = data[3]
-            formatted_data = {
-                'code': stock_code,
-                'bid': bid,
-                'ask': ask,
-                'max': max,
-                'min': min
-            }
-            # Dispatching data:
-            print(formatted_data)
-            self.dispatch(formatted_data)
-            # Waiting to get next data
-            # Sec * Min
-            time.sleep(60 * 30)
+            now = datetime.now(pytz.timezone('Brazil/East'))
+            current_hour = now.hour
+            current_date = now.strftime("%Y%m%d")
+            last_data = pd.read_csv(HIST_PATH + 'PETR4' + "_2019")
+            last_data = last_data.iloc[len(last_data)-1]['DATA DO PREGAO']
+            need_to_add_line = False if current_date == last_data else True
+
+            for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
+                try:
+                    data = self.fetch_data(stock_code=blue_chip, mt_socket=mt_socket)
+                    bid = data['bid']
+                    max = data['max']
+                    min = data['min']
+                    stock = pd.read_csv(HIST_PATH + blue_chip + "_2019")
+                    last_40_closes = stock['PRECO FECHAMENTO'].iloc[len(stock) - 41:len(stock) - 1]
+                    last_20_closes = stock['PRECO FECHAMENTO'].iloc[len(stock) - 21:len(stock) - 1]
+
+                    print(last_20_closes.std())
+                    fresh_data = [current_date, blue_chip,'-',bid,max,min,bid,'-',0,0,0,0,0,0,'-','-','-','-']
+                    if need_to_add_line:
+                        stock.loc[len(stock)] = fresh_data
+
+                    print(stock.loc[len(stock) - 1])
+                except Exception as e:
+                    self.logger.error(e)
+
+                break
+            break
+            print('Tracking Pairs..')
+            time.sleep(2)
+
+            for pair in pairs_df['Par']:
+                try:
+                    pair = pair.split('_')
+                    data = self.fetch_data(stock_code=pair[0], mt_socket=mt_socket)
+                    print(data)
+                    # TODO UPDATE VALUES
+                    data = self.fetch_data(stock_code=pair[1], mt_socket=mt_socket)
+                    print(data)
+                    # TODO UPDATE VALUES
+                except Exception as e:
+                    self.logger.error(e)
+            time.sleep(60*5)
+
+    def fetch_data(self, stock_code, mt_socket):
+        data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
+        bid = data[0]
+        ask = data[1]
+        max = data[2]
+        min = data[3]
+        formatted_data = {
+            'code': stock_code,
+            'bid': bid,
+            'ask': ask,
+            'max': max,
+            'min': min
+        }
+        return formatted_data
 
     def dispatch(self, data):
         # Filling queues
@@ -93,8 +136,7 @@ class Sniffer(mt.MetaTrader):
                 queue.put_nowait(data)
 
     def metatrader_acquisition(self, socket, stock_code):
-        self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
+        # TODO UNC  self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'RATES|' + stock_code)
-        print(mt_response)
-        self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
+        # TODO UNC  self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
         return mt_response

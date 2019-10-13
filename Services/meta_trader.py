@@ -22,8 +22,9 @@ class MetaTrader:
         """
             Send data to MetaTrader
             Parameters: socket, data: ('RATES|PETR4')
+            Parameters: socket, data: ('TRADE|BUY or SELL|PETR4')
             Return: stock data:
-            stock data: (bid, ask, buy_volume, sell_volume, tick_volume, real_volume, buy_volume_market, sell_volume_market)
+            stock data: (bid, ask, max, min)
         """
         try:
             socket.send_string(data)
