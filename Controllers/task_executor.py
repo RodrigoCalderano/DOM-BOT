@@ -18,32 +18,29 @@ class TaskExecutor(mt.MetaTrader):
         socket = self.socket
         logger = self.logger
         while True:
-            # TODO UNC logger.info('Standby', cname=type(self).__name__)
+            logger.info('Standby', cname=type(self).__name__)
             data_from_q = self._iqueue.get()
-            # TODO UNC logger.info('Running', cname=type(self).__name__)
-            print(data_from_q)
-            print('---------------------------------------------------------')
+            logger.info('Running', cname=type(self).__name__)
 
-            # data_from_q['msg'] = data_from_q['action'] + data_from_q['CODIGO DE NEGOCIACAO DO PAPEL'] +\
-            #     " em :" + str(data_from_q['DATA DO PREGAO'])
+            action = data_from_q['action']
+            action_pt = 'comprar ' if action == 'BUY' else 'vender '
+            stock_code = data_from_q['CODIGO DE NEGOCIACAO DO PAPEL']
+            date = data_from_q['DATA DO PREGAO']
+            price = data_from_q['PRECO FECHAMENTO']
+            setup = data_from_q['setup']
 
-            # TODO TELEGRAM DISABLED FOR BACK TESTING
-            #  Telegram.send_message(str(data_from_q['msg']))
+            Telegram.send_message(setup + '\nHora de ' + action_pt + stock_code + '\nPreco atual: ' + price)
 
-            # self.metatrader_trade(socket=socket, data=data_from_q)
+            self.metatrader_trade(socket=socket, data=data_from_q)
 
             self._iqueue.task_done()
 
     def metatrader_trade(self, socket, data):
-        stock_code = data['stock_code']
-        self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
-
-        # TODO PEGAR OS DADOS DA OPERACAO A PARTIR DO DATA
-
+        stock_code = data['CODIGO DE NEGOCIACAO DO PAPEL']
+        self.logger.info('Sending order to Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'TRADE|BUY|' + stock_code)
-
-        print(mt_response)
         self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
+        Telegram.send_message(mt_response)
         return mt_response
 
 

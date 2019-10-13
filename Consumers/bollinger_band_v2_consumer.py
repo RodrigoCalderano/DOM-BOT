@@ -9,9 +9,9 @@ class BollingerV2BandConsumer(extend.BaseConsumer):
         logger = self.logger
         fill_oqueue = False
         while True:
-            # TODO UNC logger.info('Standby - Waiting for data on queue', cname=type(self).__name__)
+            logger.info('Standby - Waiting for data on queue', cname=type(self).__name__)
             data = self._iqueue.get()
-            # TODO UNC logger.info('Running', cname=type(self).__name__)
+            logger.info('Running', cname=type(self).__name__)
             stock_code = data['CODIGO DE NEGOCIACAO DO PAPEL']
 
             # Strategy data frame

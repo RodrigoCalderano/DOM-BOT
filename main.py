@@ -44,7 +44,6 @@ def main():
     sniffer.register_queue(bollinger_band_queue)
     sniffer.register_queue(bollinger_band_v2_queue)
 
-    # TODO UNC: RUN ALL
     # Run the consumers
     long_short_consumer.run()
     bollinger_band_consumer.run()
