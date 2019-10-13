@@ -4,6 +4,7 @@ import datetime
 from datetime import datetime
 import pytz
 
+from Services.telegram_alarm import Telegram
 from Services import meta_trader as mt
 from Helper import Constants
 
@@ -70,8 +71,17 @@ class Sniffer(mt.MetaTrader):
 
         while True:
             now = datetime.now(pytz.timezone('Brazil/East'))
-            current_hour = now.hour
+            current_hour = int(now.hour)
+            current_minute = int(now.minute)
             current_date = str(now.strftime("%Y%m%d"))
+
+            if 25 < current_minute < 30:  # Heartbeat
+                Telegram.send_message('Bip')
+
+            if not 10 < current_hour < 17: # Maked closed
+                self.logger.info('Market closed, waiting until it opens', cname=type(self).__name__)
+                time.sleep(60 * 5)
+                continue
 
             for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
                 try:
@@ -104,21 +114,19 @@ class Sniffer(mt.MetaTrader):
                 except Exception as e:
                     self.logger.error(e)
 
-            print('Tracking Pairs..')
             time.sleep(2)
 
             for pair in pairs_df['Par']:
                 try:
                     pair = pair.split('_')
                     data = self.fetch_data(stock_code=pair[0], mt_socket=mt_socket)
-                    print(data)
                     # TODO UPDATE VALUES
                     data = self.fetch_data(stock_code=pair[1], mt_socket=mt_socket)
-                    print(data)
                     # TODO UPDATE VALUES
                 except Exception as e:
                     self.logger.error(e)
             time.sleep(60*5)
+
 
     def fetch_data(self, stock_code, mt_socket):
         data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
