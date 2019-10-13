@@ -71,32 +71,39 @@ class Sniffer(mt.MetaTrader):
         while True:
             now = datetime.now(pytz.timezone('Brazil/East'))
             current_hour = now.hour
-            current_date = now.strftime("%Y%m%d")
-            last_data = pd.read_csv(HIST_PATH + 'PETR4' + "_2019")
-            last_data = last_data.iloc[len(last_data)-1]['DATA DO PREGAO']
-            need_to_add_line = False if current_date == last_data else True
+            current_date = str(now.strftime("%Y%m%d"))
 
             for blue_chip in blue_chips['CODIGO DE NEGOCIACAO DO PAPEL']:
                 try:
+                    # Check last update date
+                    last_data = pd.read_csv(HIST_PATH + blue_chip + "_2019")
+                    last_data = str(last_data.iloc[len(last_data) - 1]['DATA DO PREGAO'])
+
+                    # Fetch data From MT
                     data = self.fetch_data(stock_code=blue_chip, mt_socket=mt_socket)
                     bid = data['bid']
                     max = data['max']
                     min = data['min']
+
+                    # Create statistics data
                     stock = pd.read_csv(HIST_PATH + blue_chip + "_2019")
                     last_40_closes = stock['PRECO FECHAMENTO'].iloc[len(stock) - 41:len(stock) - 1]
                     last_20_closes = stock['PRECO FECHAMENTO'].iloc[len(stock) - 21:len(stock) - 1]
+                    fresh_data = [current_date, blue_chip, '-', bid, max, min, bid, '-',
+                                  last_20_closes.mean(), last_40_closes.mean(), last_20_closes.std(),
+                                  last_40_closes.std(), last_40_closes.mean() + 2 * last_40_closes.std(),
+                                  last_40_closes.mean() - 2 * last_40_closes.std(), '-', '-', '-', '-']
 
-                    print(last_20_closes.std())
-                    fresh_data = [current_date, blue_chip,'-',bid,max,min,bid,'-',0,0,0,0,0,0,'-','-','-','-']
-                    if need_to_add_line:
+                    # Update our db
+                    if current_date == last_data:  # Update last row
+                        stock.loc[len(stock)-1] = fresh_data
+                    else:  # Create new line for current day
                         stock.loc[len(stock)] = fresh_data
-
-                    print(stock.loc[len(stock) - 1])
+                    stock.to_csv((HIST_PATH + blue_chip + "_2019"), index=False)
+                    self.dispatch(stock.iloc[len(stock) - 1])
                 except Exception as e:
                     self.logger.error(e)
 
-                break
-            break
             print('Tracking Pairs..')
             time.sleep(2)
 
@@ -130,13 +137,13 @@ class Sniffer(mt.MetaTrader):
 
     def dispatch(self, data):
         # Filling queues
-        for queue in self._queues:
-            # TODO UNC self.logger.info('Filling queue', cname=type(self).__name__)
-            if data is not None:
-                queue.put_nowait(data)
+        bb_queue = self._queues[1]
+        self.logger.info('Filling queue', cname=type(self).__name__)
+        if data is not None:
+            bb_queue.put_nowait(data)
 
     def metatrader_acquisition(self, socket, stock_code):
-        # TODO UNC  self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
+        self.logger.info('Getting data from Metatrader', cname=type(self).__name__)
         mt_response = self.meta_trader_get_values(socket, 'RATES|' + stock_code)
-        # TODO UNC  self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
+        self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
         return mt_response
