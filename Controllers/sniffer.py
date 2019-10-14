@@ -75,8 +75,13 @@ class Sniffer(mt.MetaTrader):
             current_minute = int(now.minute)
             current_date = str(now.strftime("%Y%m%d"))
 
-            if 25 < current_minute < 30:  # Heartbeat
+            if 35 < current_minute < 40:  # Heartbeat
                 Telegram.send_message('Bip')
+
+            if 1 < current_minute < 10:  # Heartbeat
+                Telegram.send_message('Bip')
+                data = self.fetch_data(stock_code='PETR4', mt_socket=mt_socket)
+                Telegram.send_message('PETR4: ' + data['bid'])
 
             if not 10 < current_hour < 17: # Maked closed
                 self.logger.info('Market closed, waiting until it opens', cname=type(self).__name__)
@@ -127,9 +132,10 @@ class Sniffer(mt.MetaTrader):
                     self.logger.error(e)
             time.sleep(60*5)
 
-
     def fetch_data(self, stock_code, mt_socket):
         data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
+        while data[0] == '0.00':
+            data = (self.metatrader_acquisition(socket=mt_socket, stock_code=stock_code)).split(',')
         bid = data[0]
         ask = data[1]
         max = data[2]
