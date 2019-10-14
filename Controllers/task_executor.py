@@ -38,7 +38,7 @@ class TaskExecutor(mt.MetaTrader):
     def metatrader_trade(self, socket, data):
         stock_code = data['CODIGO DE NEGOCIACAO DO PAPEL']
         self.logger.info('Sending order to Metatrader', cname=type(self).__name__)
-        mt_response = self.meta_trader_get_values(socket, 'TRADE|BUY|' + stock_code)
+        mt_response = self.meta_trader_get_values(socket, 'TRADE|' + data['action'] + |' + stock_code)
         self.logger.info('MetaTrader response: ' + mt_response, cname=type(self).__name__)
         Telegram.send_message(mt_response)
         return mt_response
