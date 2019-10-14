@@ -57,7 +57,7 @@ class BollingerBandConsumer(extend.BaseConsumer):
 
             # Looking for close short position
             elif current_state == 'VENDIDO':
-                if float(data['PRECO PRECO']) < float(data['MA_40']):
+                if float(data['PRECO FECHAMENTO']) < float(data['MA_40']):
                     data['action'] = 'BUY'
                     strategy.loc[stock_code, 'ESTADO'] = 'PROCURANDO ENTRADA'
                     price = data['PRECO FECHAMENTO']
