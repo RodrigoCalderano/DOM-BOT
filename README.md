@@ -1,6 +1,5 @@
 # Sistema Automatizado para Operação na Bolsa de Valores
 
-## Objetivo
 Este projeto tem como objetivo:
 
 * Aprimorar estratégias de operação na bolsa de valores baseadas em análise técnica por meio de otimização de parâmetros a partir de backtesting.
