@@ -2,7 +2,9 @@
 
 ## Objetivo
 Este projeto tem como objetivo:
+
 1- Aprimorar estratégias de operação na bolsa de valores baseadas em análise técnica por meio de otimização de parâmetros a partir de backtesting.
+
 2- Automatizar operações em tempo real utlizando o MetaTrader e Bot no Telegram para monitoramento.
 
 ## Arquitetura
