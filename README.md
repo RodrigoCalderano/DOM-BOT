@@ -2,11 +2,12 @@
 
 Este projeto tem como objetivo:
 
-* Aprimorar estratégias de operação na bolsa de valores baseadas em análise técnica por meio de otimização de parâmetros a partir de backtesting.
+* Aprimorar estratégias de operação na bolsa de valores baseadas em análise técnica buscando otimização de parâmetros a partir de backtesting.
 * Automatizar operações em tempo real utlizando MetaTrader e um Bot do Telegram para monitoramento.
+* Tratar valores históricos de forma a gerar um banco com indicadores necessários para o projeto
 
 ## Arquitetura
-A arquitetura proposta é baseada em um sistema que consome dados do banco contendo valores históricos, assim como coleta dados em tempo real pelo MetaTrader e, após um tratamento, estes dados são enviados por meio de filas assíncronas que são consumidas pelos módulos que representam as estratégias.
+A arquitetura proposta é baseada em um sistema que consome um banco de valores históricos, coleta dados em tempo real pelo MetaTrader e, após um tratamento, estes dados são enviados por meio de filas assíncronas que são consumidas pelos módulos que representam as estratégias.
 
 ![alt text](Drawables/diagrama_vetor.png "Diagrama do sistema proposto")
 
