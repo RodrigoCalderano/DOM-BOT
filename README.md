@@ -7,7 +7,7 @@ Este projeto tem como objetivo:
 * Automatizar operações em tempo real utlizando MetaTrader e um Bot do Telegram para monitoramento.
 
 ## Arquitetura
-A arquitetura proposta é baseada em um sistema que consome um banco de valores históricos, coleta dados em tempo real pelo MetaTrader e, após um tratamento, estes dados são enviados por meio de filas assíncronas que são consumidas pelos módulos que representam as estratégias.
+A arquitetura proposta é baseada em um sistema que utiliza um banco de valores históricos, coleta dados em tempo real pelo MetaTrader e, após um tratamento, envia estes dados por meio de filas assíncronas que são consumidas pelos módulos que representam as estratégias.
 
 ![alt text](Drawables/diagrama_vetor.png "Diagrama do sistema proposto")
 
