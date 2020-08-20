@@ -3,7 +3,7 @@
 ## Arquitetura
 A arquitetura proposta é baseada em um sistema de filas assíncronas e é apresentada a seguir.
 
-![alt text](banda_bollinger_exemplo\Diagrama.png "Diagrama do sistema proposto")
+![alt text](Drawables\banda_bollinger_exemplo.png "Diagrama do sistema proposto")
 
 **MAD** - Módulo de aquisição de dados: responsável por obter os dados do Metatrader.
 
