@@ -8,7 +8,7 @@ Este projeto tem como objetivo:
 ## Arquitetura
 A arquitetura proposta é baseada em um sistema que consome dados do banco contendo valores históricos, assim como coleta dados em tempo real pelo MetaTrader e, após um tratamento, estes dados são enviados por meio de filas assíncronas que são consumidas pelos módulos que representam as estratégias.
 
-![alt text](Drawables/diagrama_vector.png "Diagrama do sistema proposto")
+![alt text](Drawables/diagrama_vetor.png "Diagrama do sistema proposto")
 
 **MAD** - Módulo de aquisição de dados: responsável por obter os dados do Metatrader.
 
